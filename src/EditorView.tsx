@@ -63,40 +63,38 @@ import {
     Underline
 } from 'ckeditor5';
 
-
 import 'ckeditor5/ckeditor5.css';
 import 'ckeditor5-premium-features/ckeditor5-premium-features.css';
 
 import './EditorView.scss';
-
+import { Editor } from "@tinymce/tinymce-react";
 
 import {
-  CaseChange,
-  SlashCommand,
-  PasteFromOfficeEnhanced,
-  Pagination,
-  MultiLevelList,
-  MergeFields,
+    CaseChange,
+    SlashCommand,
+    PasteFromOfficeEnhanced,
+    Pagination,
+    MultiLevelList,
+    MergeFields,
 } from 'ckeditor5-premium-features';
 
+import StructuredDataPlugin from './structured-data/structureddataplugin';
 
 // Get it from the env var VITE_LICENSE_KEY
-const LICENSE_KEY = import.meta.env.VITE_LICENSE_KEY;
+const LICENSE_KEY = import.meta.env.VITE_LICENSE_KEY ?? 'GPL';
 
 const EditorView = () => {
-
-    const editorContainerRef = useRef<HTMLDivElement|null>(null);
-    const editorMenuBarRef = useRef<HTMLDivElement|null>(null);
-    const editorToolbarRef = useRef<HTMLDivElement|null>(null);
-    const editorRef = useRef<HTMLDivElement|null>(null);
+    const editorContainerRef = useRef(null);
+    const editorMenuBarRef = useRef(null);
+    const editorToolbarRef = useRef(null);
+    const editorHtmlRef = useRef(null);
+    const editorRef = useRef(null);
     const [isLayoutReady, setIsLayoutReady] = useState(false);
 
     useEffect(() => {
         setIsLayoutReady(true);
-
         return () => setIsLayoutReady(false);
     }, []);
-
 
     const { editorConfig } = useMemo(() => {
         if (!isLayoutReady) {
@@ -152,6 +150,7 @@ const EditorView = () => {
                     Code,
                     Essentials,
                     FindAndReplace,
+                    StructuredDataPlugin,
                     FontBackgroundColor,
                     FontColor,
                     FontFamily,
@@ -290,7 +289,7 @@ const EditorView = () => {
                     ]
                 },
                 initialData: '',
-                licenseKey: LICENSE_KEY,
+                licenseKey: 'eyJhbGciOiJFUzI1NiJ9.eyJleHAiOjE3NDQ2NzUxOTksImp0aSI6IjlkMzRhOGNkLWJiNDQtNGE2Yy05MjJkLWFjZDNkODA1ODM1YyIsInVzYWdlRW5kcG9pbnQiOiJodHRwczovL3Byb3h5LWV2ZW50LmNrZWRpdG9yLmNvbSIsImRpc3RyaWJ1dGlvbkNoYW5uZWwiOlsiY2xvdWQiLCJkcnVwYWwiLCJzaCJdLCJ3aGl0ZUxhYmVsIjp0cnVlLCJsaWNlbnNlVHlwZSI6InRyaWFsIiwiZmVhdHVyZXMiOlsiKiJdLCJ2YyI6ImRkZTBmYzU3In0.Xh5HxJoyLK_i3Q-ZHtoDRuBni9Jlfxx3oFlSn_Eyai6-mtD6AmfzhIQu1znUcrZjQaW60OHdheD0zOcbiM51ng',
                 link: {
                     addTargetToExternalLinks: true,
                     defaultProtocol: 'https://',
@@ -344,37 +343,39 @@ const EditorView = () => {
         };
     }, [isLayoutReady]);
 
-
-    return (<div className='main-container'>
-        <div className='editor-container editor-container_document-editor editor-container_include-pagination'
-             ref={editorContainerRef}>
-            <div className='editor-container__menu-bar' ref={editorMenuBarRef}></div>
-            <div className='editor-container__toolbar' ref={editorToolbarRef}></div>
-            <div className='editor-container__editor-wrapper'>
-                <div className='editor-container__editor'>
-                    <div ref={editorRef}>
-                        {editorConfig && (
-                            <CKEditor
-                                onReady={editor => {
-                                    editorToolbarRef?.current?.appendChild(editor.ui.view.toolbar.element as Node);
-                                    editorMenuBarRef?.current?.appendChild(editor.ui.view.menuBarView.element as Node);
-                                }}
-                                onAfterDestroy={() => {
-                                    if(!editorToolbarRef.current || !editorMenuBarRef.current) {
-                                        return;
-                                    }
-                                    Array.from(editorToolbarRef.current.children).forEach(child => child.remove());
-                                    Array.from(editorMenuBarRef.current.children).forEach(child => child.remove());
-                                }}
-                                editor={DecoupledEditor}
-                                config={editorConfig}
-                            />
-                        )}
+    return (
+        <div className='main-container'>
+            <div className='editor-container editor-container_document-editor editor-container_include-pagination'
+                 ref={editorContainerRef}>
+                <div className='editor-container__menu-bar' ref={editorMenuBarRef}></div>
+                <div className='editor-container__toolbar' ref={editorToolbarRef}></div>
+                <div className='editor-container__editor-wrapper'>
+                    <div className='editor-container__editor'>
+                        <div ref={editorHtmlRef}>
+                            {editorConfig && (
+                                <CKEditor
+                                    onReady={editor => {
+                                        editorRef.current = editor;
+                                        editorToolbarRef?.current?.appendChild(editor.ui.view.toolbar.element as Node);
+                                        editorMenuBarRef?.current?.appendChild(editor.ui.view.menuBarView.element as Node);
+                                    }}
+                                    onAfterDestroy={() => {
+                                        if (!editorToolbarRef.current || !editorMenuBarRef.current) {
+                                            return;
+                                        }
+                                        Array.from(editorToolbarRef.current.children).forEach(child => child.remove());
+                                        Array.from(editorMenuBarRef.current.children).forEach(child => child.remove());
+                                    }}
+                                    editor={DecoupledEditor}
+                                    config={editorConfig}
+                                />
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>);
+    );
 };
 
 export default EditorView;

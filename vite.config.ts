@@ -1,23 +1,18 @@
 import { defineConfig } from 'vite';
-import reactRefresh from '@vitejs/plugin-react-refresh';
+import react from '@vitejs/plugin-react';
 import mkcert from 'vite-plugin-mkcert';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ command }) => ({
     base: '/',
     server: {
-        https: {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            maxSessionMemory: 100,
-            peerMaxConcurrentStreams: 100,
-        },
+        https: true,
         port: 3001,
         hmr: {
             host: 'localhost'
         }
     },
-    plugins: [reactRefresh(), mkcert()],
+    plugins: [react(), mkcert()],
     build: {
         commonjsOptions: {
             include: [
@@ -27,6 +22,6 @@ export default defineConfig(({ command }) => ({
         sourcemap: true
     },
     optimizeDeps: {
-        include: ['react', 'ckeditor5', 'ckeditor5-premium-features'],
+        include: ['react'],
     },
 }));
