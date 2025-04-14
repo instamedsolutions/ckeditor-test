@@ -1,6 +1,4 @@
-import { Plugin } from '@ckeditor/ckeditor5-core';
-import { Widget } from '@ckeditor/ckeditor5-widget';
-import { toWidget } from '@ckeditor/ckeditor5-widget/src/utils';
+import { Plugin, Widget, toWidget } from 'ckeditor5';
 import StructuredDataCommand from './structureddatacommand';
 
 export default class StructuredDataEditing extends Plugin {

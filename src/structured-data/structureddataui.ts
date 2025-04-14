@@ -1,5 +1,5 @@
-import { Plugin } from '@ckeditor/ckeditor5-core';
-import { ButtonView } from '@ckeditor/ckeditor5-ui';
+import { Plugin, ButtonView } from 'ckeditor5';
+
 
 export default class StructuredDataUI extends Plugin {
   init() {
